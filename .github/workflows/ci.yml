@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - main
+      - dev
   release:
     types: [published]
   workflow_dispatch:
@@ -18,6 +19,12 @@ on:
         type: boolean
         default: true
 
+permissions:
+  issues: write
+  contents: read
+  security-events: write
+  actions: read
+
 jobs:
 
   lint-and-test:
@@ -30,10 +37,6 @@ jobs:
   security:
     name: Analise de Seguranca (CodeQL)
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
 
     steps:
       - name: Checkout do repositorio
@@ -56,3 +59,37 @@ jobs:
 
       - name: Executar analise CodeQL
         uses: github/codeql-action/analyze@v3
+
+      - name: Abrir issue se analise falhou
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Falha na analise de seguranca — ${context.ref_name} (run #${context.runNumber})`,
+              body: `O workflow **${context.workflow}** falhou na etapa de seguranca.\n\nCommit: ${context.sha}\nAcionado por: @${context.actor}`,
+              labels: ['bug', 'ci-failure']
+            })
+
+  deploy-dev:
+    name: Deploy Dev
+    needs: lint-and-test
+    if: github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Deploy em DEV
+        run: echo "Deploy em DEV — ${{ vars.DEPLOY_URL }}"
+
+  deploy-prod:
+    name: Deploy Prod
+    needs: lint-and-test
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Deploy em PROD
+        run: echo "Deploy em PROD aprovado por revisor"
