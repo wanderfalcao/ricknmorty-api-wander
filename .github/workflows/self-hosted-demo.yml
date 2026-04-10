@@ -1,0 +1,19 @@
+name: Self-hosted Demo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  info:
+    runs-on: self-hosted
+    steps:
+      - name: Info do sistema
+        run: |
+          java -version
+          mvn -version
+
+      - name: Instalar software adicional
+        run: choco install curl -y --no-progress
+
+      - name: Verificar instalacao
+        run: curl --version
