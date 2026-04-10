@@ -1,0 +1,20 @@
+name: Vars and Secrets Demo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Exibir variaveis de ambiente
+        run: |
+          echo "APP_MODE=${{ vars.APP_MODE }}"
+          echo "SUPPORT_EMAIL=${{ vars.SUPPORT_EMAIL }}"
+
+      - name: Passo protegido com secret
+        env:
+          TOKEN: ${{ secrets.PROD_TOKEN }}
+        run: |
+          echo "Token disponivel: ${{ secrets.PROD_TOKEN != '' }}"
+          echo "Simulando autenticacao com PROD_TOKEN..."
