@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+    container_name: ricknmorty-db
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - ricknmorty-db-data:/var/lib/postgresql/data
+    networks:
+      - ricknmorty-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ricknmorty-api
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: admin
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ricknmorty-net
+
+volumes:
+  ricknmorty-db-data:
+
+networks:
+  ricknmorty-net:
+    driver: bridge
