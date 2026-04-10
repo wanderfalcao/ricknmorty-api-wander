@@ -1,0 +1,31 @@
+name: Env Context Demo
+
+on:
+  workflow_dispatch:
+
+env:
+  STAGE: workflow-level
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    env:
+      STAGE: job-level
+    steps:
+      - name: Contexto do GitHub
+        run: |
+          echo "Acionado por: ${{ github.actor }}"
+          echo "Evento: ${{ github.event_name }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "SO do runner: ${{ runner.os }}"
+
+      - name: Variavel nivel workflow vs job
+        run: echo "STAGE=$STAGE"
+
+      - name: Variavel nivel step (sobrepoe job)
+        env:
+          STAGE: step-level
+        run: echo "STAGE=$STAGE"
+
+      - name: Confirmacao retorno ao nivel job
+        run: echo "STAGE=$STAGE"
