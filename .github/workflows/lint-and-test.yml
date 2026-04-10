@@ -1,0 +1,79 @@
+name: Lint and Test
+
+on:
+  workflow_call:
+    inputs:
+      run_tests:
+        description: "Executar os testes automatizados"
+        type: boolean
+        default: true
+      run_lint:
+        description: "Executar verificacao de lint"
+        type: boolean
+        default: true
+
+jobs:
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    if: ${{ inputs.run_lint }}
+    steps:
+      - name: Checkout do repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: temurin
+          cache: maven
+
+      - name: Validar estrutura do projeto (POM)
+        run: mvn validate -q
+
+      - name: Verificar compilacao sem erros
+        run: mvn compile -q
+
+  test:
+    name: Testes
+    runs-on: ubuntu-latest
+    if: ${{ inputs.run_tests }}
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: admin
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout do repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: temurin
+          cache: maven
+
+      - name: Inicializar schema do banco
+        run: psql -h localhost -U postgres -d postgres -f dados/data.sql
+        env:
+          PGPASSWORD: admin
+
+      - name: Executar testes
+        run: mvn test
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: admin
