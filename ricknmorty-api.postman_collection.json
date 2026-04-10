@@ -1,0 +1,102 @@
+{
+  "info": {
+    "name": "Rick and Morty API",
+    "description": "Colecao de requisicoes para a API Rick and Morty - DR3 TP1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Characters",
+      "item": [
+        {
+          "name": "Listar todos os personagens",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/characters",
+              "host": ["{{base_url}}"],
+              "path": ["api", "characters"]
+            },
+            "description": "Retorna todos os personagens. O header X-Total-Count na resposta indica o total de registros."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar personagens com paginacao",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "page",
+                "value": "0",
+                "description": "Numero da pagina (comeca em 0)"
+              },
+              {
+                "key": "size",
+                "value": "10",
+                "description": "Quantidade de registros por pagina"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/characters",
+              "host": ["{{base_url}}"],
+              "path": ["api", "characters"]
+            },
+            "description": "Retorna personagens com paginacao via headers page e size."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar - pagina 1, 20 por pagina",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "page",
+                "value": "1"
+              },
+              {
+                "key": "size",
+                "value": "20"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/characters",
+              "host": ["{{base_url}}"],
+              "path": ["api", "characters"]
+            },
+            "description": "Exemplo de segunda pagina com 20 registros por pagina."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Actuator Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/actuator/health",
+              "host": ["{{base_url}}"],
+              "path": ["actuator", "health"]
+            },
+            "description": "Verifica se a aplicacao esta no ar. Retorna status UP quando saudavel."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
