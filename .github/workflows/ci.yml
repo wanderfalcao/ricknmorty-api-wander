@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      run_tests:
+        description: "Executar testes automatizados"
+        type: boolean
+        default: true
+      run_lint:
+        description: "Executar lint"
+        type: boolean
+        default: true
+
+jobs:
+
+  lint-and-test:
+    name: Lint e Testes
+    uses: ./.github/workflows/lint-and-test.yml
+    with:
+      run_tests: ${{ github.event_name != 'workflow_dispatch' || inputs.run_tests }}
+      run_lint: ${{ github.event_name != 'workflow_dispatch' || inputs.run_lint }}
+
+  security:
+    name: Analise de Seguranca (CodeQL)
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout do repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: temurin
+          cache: maven
+
+      - name: Inicializar CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
+
+      - name: Build para analise
+        run: mvn package -DskipTests -q
+
+      - name: Executar analise CodeQL
+        uses: github/codeql-action/analyze@v3
