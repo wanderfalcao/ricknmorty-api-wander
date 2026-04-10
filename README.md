@@ -1,3 +1,5 @@
+![CI](https://github.com/wanderfalcao/ricknmorty-api-wander/actions/workflows/ci.yml/badge.svg)
+
 # Rick and Morty API
 
 API REST desenvolvida com Spring Boot e Java 17, que serve dados de personagens
@@ -71,3 +73,48 @@ do serviço `db` dentro da rede Docker `ricknmorty-net`.
 Os dados do PostgreSQL são persistidos no volume `ricknmorty-db-data`.
 O script `dados/data.sql` roda automaticamente apenas na primeira inicialização
 do container, via `/docker-entrypoint-initdb.d/`.
+
+---
+
+## Pipeline de CI
+
+O workflow principal fica em `.github/workflows/ci.yml` e roda em dois cenários:
+
+- **Push na main**: executa automaticamente lint, testes e análise de segurança
+- **Execução manual**: disponível na aba Actions > CI > Run workflow, com opção de
+  escolher se quer rodar os testes e/ou o lint
+
+### Jobs
+
+| Job                   | O que faz                                                                  |
+|-----------------------|----------------------------------------------------------------------------|
+| Lint                  | Valida o POM e compila o projeto para garantir que não há erros de código  |
+| Testes                | Sobe um container PostgreSQL e executa `mvn test`                          |
+| Analise de Segurança  | Roda o CodeQL para identificar vulnerabilidades no código Java             |
+
+O lint e os testes vivem em um workflow separado (`lint-and-test.yml`) chamado
+pelo `ci.yml` via `workflow_call`, mantendo o pipeline organizado e reutilizável.
+
+---
+
+## Depuração de pipeline
+
+Para exercitar a depuração, o step de compilação no job de lint foi alterado
+temporariamente para `run: exit 1`, simulando uma falha proposital. Após o push,
+a execução apareceu com status de falha na aba Actions. Ao expandir o step com
+o ícone vermelho, o log exibiu `Process completed with exit code 1`, indicando
+exatamente onde o pipeline parou. Após reverter para `run: mvn compile -q` e
+novo push, o pipeline voltou ao verde.
+
+---
+
+## Execução manual vs automática
+
+No push automático, o workflow é disparado imediatamente após o commit chegar na
+branch main, sem nenhuma intervenção — lint, testes e análise de segurança rodam
+juntos com os valores padrão.
+
+Na execução manual via botão "Run workflow", é possível ativar ou desativar os
+inputs `run_tests` e `run_lint` antes de iniciar, útil para validar só uma parte
+do pipeline. A execução manual aparece com o gatilho `workflow_dispatch` nos logs
+da aba Actions, facilitando a distinção entre os dois modos no histórico.
