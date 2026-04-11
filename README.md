@@ -1,4 +1,4 @@
-![CI](https://github.com/wanderfalcao/ricknmorty-api-wander/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/wanderfalcao/ricknmorty-api-wander/actions/workflows/ci.yml/badge.svg)](https://github.com/wanderfalcao/ricknmorty-api-wander/actions/workflows/ci.yml)
 
 # Rick and Morty API
 
