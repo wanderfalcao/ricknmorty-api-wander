@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Rick and Morty API",
-    "description": "Colecao de requisicoes para a API Rick and Morty - DR3 TP1",
+    "description": "Colecao de requisicoes para a API Rick and Morty",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -74,6 +74,25 @@
               "path": ["api", "characters"]
             },
             "description": "Exemplo de segunda pagina com 20 registros por pagina."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Stats",
+      "item": [
+        {
+          "name": "Estatisticas por status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/characters/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "characters", "stats"]
+            },
+            "description": "Retorna o total de personagens e a contagem agrupada por status (Alive, Dead, unknown)."
           },
           "response": []
         }

@@ -118,3 +118,42 @@ Na execução manual via botão "Run workflow", é possível ativar ou desativar
 inputs `run_tests` e `run_lint` antes de iniciar, útil para validar só uma parte
 do pipeline. A execução manual aparece com o gatilho `workflow_dispatch` nos logs
 da aba Actions, facilitando a distinção entre os dois modos no histórico.
+
+---
+
+## Endpoint de estatísticas
+
+`GET /api/characters/stats` retorna a contagem total de personagens agrupada por status:
+
+```bash
+curl http://localhost:8080/api/characters/stats
+```
+
+Resposta esperada:
+
+```json
+{
+  "total": 826,
+  "byStatus": {
+    "Alive": 439,
+    "Dead": 262,
+    "unknown": 125
+  }
+}
+```
+
+---
+
+## Workflows adicionais (TP3)
+
+| Workflow               | Arquivo                   | Descrição                                          |
+|------------------------|---------------------------|----------------------------------------------------|
+| Env Context Demo       | `env-context-demo.yml`    | Demonstra contextos e escopos de variáveis         |
+| Vars and Secrets Demo  | `vars-demo.yml`           | Demonstra uso de variáveis e secrets do repositório |
+| Self-hosted Demo       | `self-hosted-demo.yml`    | Executa jobs no runner auto-hospedado              |
+
+O `ci.yml` também foi estendido com:
+
+- Permissões explícitas via `permissions:`
+- Criação automática de issue via `GITHUB_TOKEN` quando a análise de segurança falha
+- Jobs de deploy condicionais para os ambientes `dev` (branch dev) e `prod` (branch master)
